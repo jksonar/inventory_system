@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Receipt #{{ sale.invoice_number }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            line-height: 1.5;
+            color: #333;
+        }
+        .receipt {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .company-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .company-details {
+            margin-bottom: 5px;
+        }
+        .invoice-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .info-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .info-box {
+            width: 45%;
+        }
+        .info-box h3 {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .totals {
+            width: 40%;
+            margin-left: auto;
+        }
+        .totals table {
+            margin-bottom: 0;
+        }
+        .totals table td {
+            border: none;
+            padding: 5px;
+        }
+        .totals table tr.total td {
+            font-weight: bold;
+            border-top: 1px solid #ddd;
+        }
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 10px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="receipt">
+        <div class="header">
+            <div class="company-name">{{ company_name }}</div>
+            <div class="company-details">{{ company_address }}</div>
+            <div class="company-details">Phone: {{ company_phone }} | Email: {{ company_email }}</div>
+        </div>
+        
+        <div class="invoice-title">RECEIPT #{{ sale.invoice_number }}</div>
+        
+        <div class="info-section">
+            <div class="info-box">
+                <h3>Customer Information</h3>
+                <p>{{ sale.customer_name }}</p>
+                {% if sale.customer_phone %}<p>Phone: {{ sale.customer_phone }}</p>{% endif %}
+                {% if sale.customer_email %}<p>Email: {{ sale.customer_email }}</p>{% endif %}
+            </div>
+            
+            <div class="info-box">
+                <h3>Sale Information</h3>
+                <p>Date: {{ sale.sale_date|date:"F d, Y" }}</p>
+                <p>Payment Method: {{ sale.get_payment_method_display }}</p>
+                <p>Payment Status: {{ sale.get_payment_status_display }}</p>
+            </div>
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>SKU</th>
+                    <th class="text-right">Unit Price</th>
+                    <th class="text-right">Quantity</th>
+                    <th class="text-right">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in sale.items.all %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td>{{ item.product.sku }}</td>
+                    <td class="text-right">${{ item.unit_price|floatformat:2 }}</td>
+                    <td class="text-right">{{ item.quantity }}</td>
+                    <td class="text-right">${{ item.total_price|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <div class="totals">
+            <table>
+                <tr>
+                    <td>Subtotal:</td>
+                    <td class="text-right">${{ sale.total_amount|floatformat:2 }}</td>
+                </tr>
+                {% if sale.discount > 0 %}
+                <tr>
+                    <td>Discount:</td>
+                    <td class="text-right">-${{ sale.discount|floatformat:2 }}</td>
+                </tr>
+                {% endif %}
+                {% if sale.tax > 0 %}
+                <tr>
+                    <td>Tax:</td>
+                    <td class="text-right">+${{ sale.tax|floatformat:2 }}</td>
+                </tr>
+                {% endif %}
+                <tr class="total">
+                    <td>Total:</td>
+                    <td class="text-right">${{ sale.final_amount|floatformat:2 }}</td>
+                </tr>
+            </table>
+        </div>
+        
+        {% if sale.notes %}
+        <div class="notes">
+            <h

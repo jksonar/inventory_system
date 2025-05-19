@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Inventory System{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Dashboard</h1>
+
+<div class="row mb-4">
+    <!-- Inventory Stats -->
+    <div class="col-md-4">
+        <div class="card border-primary h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0"><i class="fas fa-boxes me-2"></i>Inventory</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-3">
+                    <div>Total Products</div>
+                    <div class="fw-bold">{{ total_products }}</div>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                    <div>Low Stock</div>
+                    <div class="fw-bold text-warning">{{ low_stock_products }}</div>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <div>Out of Stock</div>
+                    <div class="fw-bold text-danger">{{ out_of_stock_products }}</div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'inventory:product_list' %}" class="btn btn-sm btn-outline-primary">View Inventory</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sales Stats -->
+    <div class="col-md-4">
+        <div class="card border-success h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0"><i class="fas fa-shopping-cart me-2"></i>Sales</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-3">
+                    <div>Today</div>
+                    <div class="fw-bold">${{ today_sales.total|floatformat:2 }} ({{ today_sales.count }})</div>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                    <div>This Week</div>
+                    <div class="fw-bold">${{ week_sales.total|floatformat:2 }} ({{ week_sales.count }})</div>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <div>This Month</div>
+                    <div class="fw-bold">${{ month_sales.total|floatformat:2 }} ({{ month_sales.count }})</div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'sales:sales_list' %}" class="btn btn-sm btn-outline-success">View Sales</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Alerts -->
+    <div class="col-md-4">
+        <div class="card border-danger h-100">
+            <div class="card-header bg-danger text-white">
+                <h5 class="card-title mb-0"><i class="fas fa-bell me-2"></i>Alerts</h5>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    {% for alert in alerts %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="badge bg-{{ alert.get_priority_color }}">{{ alert.get_priority_display }}</span>
+                            {{ alert.message }}
+                        </div>
+                        <small class="text-muted">{{ alert.created_at|date:"M d" }}</small>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item">No alerts</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'dashboard:alerts' %}" class="btn btn-sm btn-outline-danger">View All Alerts</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <!-- Top Selling Products -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0"><i class="fas fa-chart-line me-2"></i>Top Selling Products</h5>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th class="text-end">Quantity Sold</th>
+                            <th class="text-end">Total Sales</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in top_products %}
+                        <tr>
+                            <td>{{ product.product__name }}</td>
+                            <td class="text-end">{{ product.total_quantity }}</td>
+                            <td class="text-end">${{ product.total_sales|floatformat:2 }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center">No sales data available</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Sales -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0"><i class="fas fa-receipt me-2"></i>Recent Sales</h5>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Invoice #</th>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th class="text-end">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sale in recent_sales %}
+                        <tr>
+                            <td><a href="{% url 'sales:sale_detail' sale.id %}">{{ sale.invoice_number }}</a></td>
+                            <td>{{ sale.customer_name }}</td>
+                            <td>{{ sale.sale_date|date:"M d, Y" }}</td>
+                            <td class="text-end">${{ sale.final_amount|floatformat:2 }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center">No recent sales</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'sales:sales_list' %}" class="btn btn-sm btn-outline-success">View All Sales</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Inventory Transactions -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0"><i class="fas fa-exchange-alt me-2"></i>Recent Inventory Transactions</h5>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Type</th>
+                            <th>Quantity</th>
+                            <th>Date</th>
+                            <th>Reference</th>
+                            <th>User</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaction in recent_transactions %}
+                        <tr>
+                            <td>{{ transaction.product.name }}</td>
+                            <td>
+                                <span class="badge bg-{{ transaction.get_transaction_type_color }}">{{ transaction.get_transaction_type_display }}</span>
+                            </td>
+                            <td>{{ transaction.quantity }}</td>
+                            <td>{{ transaction.transaction_date|date:"M d, Y H:i" }}</td>
+                            <td>{{ transaction.reference }}</td>
+                            <td>{{ transaction.created_by.username }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center">No recent transactions</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
