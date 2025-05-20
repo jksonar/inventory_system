@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Inventory Status Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            font-size: 12px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .summary {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+        }
+        .summary-item {
+            display: inline-block;
+            margin-right: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .status-out {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .status-low {
+            color: #ffc107;
+            font-weight: bold;
+        }
+        .status-ok {
+            color: #28a745;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 10px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Inventory Status Report</h1>
+        <p>Generated: {% now "M d, Y H:i" %}</p>
+    </div>
+    
+    <div class="summary">
+        <h3>Summary</h3>
+        <div class="summary-item">Total Products: {{ summary.total_products }}</div>
+        <div class="summary-item">Total Value: ${{ summary.total_value|floatformat:2 }}</div>
+        <div class="summary-item">Low Stock Items: {{ summary.low_stock }}</div>
+        <div class="summary-item">Out of Stock Items: {{ summary.out_of_stock }}</div>
+    </div>
+    
+    <h3>Inventory List</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>SKU</th>
+                <th>Product Name</th>
+                <th>Category</th>
+                <th>Supplier</th>
+                <th class="text-right">Quantity</th>
+                <th class="text-right">Unit Price</th>
+                <th class="text-right">Value</th>
+                <th class="text-right">Reorder Level</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td>{{ product.sku }}</td>
+                <td>{{ product.name }}</td>
+                <td>{{ product.category.name|default:"N/A" }}</td>
+                <td>{{ product.supplier.name|default:"N/A" }}</td>
+                <td class="text-right">{{ product.quantity_in_stock }}</td>
+                <td class="text-right">${{ product.unit_price|floatformat:2 }}</td>
+                <td class="text-right">${{ product.quantity_in_stock|multiply:product.unit_price|floatformat:2 }}</td>
+                <td class="text-right">{{ product.reorder_level }}</td>
+                <td>
+                    {% if product.quantity_in_stock == 0 %}
+                    <span class="status-out">Out of Stock</span>
+                    {% elif product.quantity_in_stock <= product.reorder_level %}
+                    <span class="status-low">Low Stock</span>
+                    {% else %}
+                    <span class="status-ok">In Stock</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <div class="footer">
+        <p>Inventory Management System &copy; {% now "Y" %}</p>
+    </div>
+</body>
+</html>

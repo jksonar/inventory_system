@@ -47,4 +47,52 @@
                 <i class="fas fa-sliders-h fa-3x mb-3 text-info"></i>
                 <h5 class="card-title">Custom Report</h5>
                 <p class="card-text">Create custom reports with specific parameters</p>
-                <a href="{% url
+                <a href="{% url 'reports:custom_report' %}" class="btn btn-info">Generate</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if recent_reports %}
+<div class="mt-5">
+    <h3>Recent Reports</h3>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>Generated</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for report in recent_reports %}
+                <tr>
+                    <td>{{ report.title }}</td>
+                    <td>
+                        {% if report.report_type == 'sales' %}
+                            <span class="badge bg-primary">Sales</span>
+                        {% elif report.report_type == 'inventory' %}
+                            <span class="badge bg-success">Inventory</span>
+                        {% elif report.report_type == 'low_stock' %}
+                            <span class="badge bg-warning">Low Stock</span>
+                        {% else %}
+                            <span class="badge bg-info">Custom</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ report.generated_at|date:"M d, Y H:i" }}</td>
+                    <td>
+                        <a href="{% url 'reports:download_report' report.id %}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-download"></i> Download
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
