@@ -1,18 +1,28 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Sales - Inventory System{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
+{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Sales</h1>
-    <a href="{% url 'sales:sale_add' %}" class="btn btn-primary">
-        <i class="fas fa-plus"></i> New Sale
-    </a>
+    <div>
+        <a href="{% url 'sales:sale_add' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> New Sale
+        </a>
+        <button type="button" class="btn btn-outline-secondary ms-2" data-bs-toggle="modal" data-bs-target="#filterModal">
+            <i class="fas fa-filter"></i> Filter
+        </button>
+    </div>
 </div>
 
-<div class="card">
+<div class="card shadow-sm">
     <div class="card-body p-0">
-        <table class="table table-hover mb-0">
+        <table id="salesTable" class="table table-hover mb-0">
             <thead>
                 <tr>
                     <th>Invoice #</th>
@@ -38,21 +48,19 @@
                         <span class="badge bg-{{ sale.get_payment_status_color }}">{{ sale.get_payment_status_display }}</span>
                     </td>
                     <td>
-                        <div class="btn-group btn-group-sm">
-                            <a href="{% url 'sales:sale_detail' sale.id %}" class="btn btn-outline-primary">
-                                <i class="fas fa-eye"></i>
-                            </a>
-                            <a href="{% url 'sales:generate_receipt' sale.id %}" class="btn btn-outline-success">
-                                <i class="fas fa-file-pdf"></i>
-                            </a>
-                            {% if sale.can_be_edited %}
-                            <a href="{% url 'sales:sale_edit' sale.id %}" class="btn btn-outline-secondary">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <a href="{% url 'sales:sale_delete' sale.id %}" class="btn btn-outline-danger">
-                                <i class="fas fa-trash"></i>
-                            </a>
-                            {% endif %}
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                Actions
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{% url 'sales:sale_detail' sale.id %}"><i class="fas fa-eye"></i> View</a></li>
+                                <li><a class="dropdown-item" href="{% url 'sales:generate_receipt' sale.id %}"><i class="fas fa-file-pdf"></i> Receipt</a></li>
+                                {% if sale.can_be_edited %}
+                                <li><a class="dropdown-item" href="{% url 'sales:sale_edit' sale.id %}"><i class="fas fa-edit"></i> Edit</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="{% url 'sales:sale_delete' sale.id %}"><i class="fas fa-trash"></i> Delete</a></li>
+                                {% endif %}
+                            </ul>
                         </div>
                     </td>
                 </tr>
@@ -65,4 +73,59 @@
         </table>
     </div>
 </div>
+
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Filter Sales</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="get">
+                    <div class="mb-3">
+                        <label for="date_from" class="form-label">Date From</label>
+                        <input type="date" class="form-control" id="date_from" name="date_from">
+                    </div>
+                    <div class="mb-3">
+                        <label for="date_to" class="form-label">Date To</label>
+                        <input type="date" class="form-control" id="date_to" name="date_to">
+                    </div>
+                    <div class="mb-3">
+                        <label for="payment_status" class="form-label">Payment Status</label>
+                        <select class="form-select" id="payment_status" name="payment_status">
+                            <option value="">All</option>
+                            <option value="paid">Paid</option>
+                            <option value="pending">Pending</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="text-end">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Apply Filters</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#salesTable').DataTable({
+            "order": [[2, "desc"]],
+            "pageLength": 25,
+            "language": {
+                "search": "Quick search:",
+                "lengthMenu": "Show _MENU_ entries",
+                "info": "Showing _START_ to _END_ of _TOTAL_ sales"
+            }
+        });
+    });
+</script>
 {% endblock %}

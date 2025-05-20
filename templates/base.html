@@ -9,10 +9,10 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
     {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
@@ -24,16 +24,16 @@
                 {% if user.is_authenticated %}
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'dashboard:home' %}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                        <a class="nav-link {% if request.resolver_match.app_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard:home' %}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'inventory:product_list' %}"><i class="fas fa-boxes"></i> Inventory</a>
+                        <a class="nav-link {% if request.resolver_match.app_name == 'inventory' %}active{% endif %}" href="{% url 'inventory:product_list' %}"><i class="fas fa-boxes"></i> Inventory</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'sales:sales_list' %}"><i class="fas fa-shopping-cart"></i> Sales</a>
+                        <a class="nav-link {% if request.resolver_match.app_name == 'sales' %}active{% endif %}" href="{% url 'sales:sales_list' %}"><i class="fas fa-shopping-cart"></i> Sales</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'reports:reports_home' %}"><i class="fas fa-chart-bar"></i> Reports</a>
+                        <a class="nav-link {% if request.resolver_match.app_name == 'reports' %}active{% endif %}" href="{% url 'reports:reports_home' %}"><i class="fas fa-chart-bar"></i> Reports</a>
                     </li>
                     {% if user.is_staff %}
                     <li class="nav-item">
@@ -85,7 +85,7 @@
     </nav>
 
     <!-- Main Content -->
-    <div class="container mt-4 mb-5">
+    <div class="container mt-4 mb-5 flex-grow-1">
         {% if messages %}
             {% for message in messages %}
             <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
@@ -110,7 +110,7 @@
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Custom JS -->
-    <script src="/static/js/main.js"></script>
+    <script src="{% static 'js/main.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

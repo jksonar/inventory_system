@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Reports - Inventory System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Reports</h1>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-chart-line fa-3x mb-3 text-primary"></i>
+                <h5 class="card-title">Sales Report</h5>
+                <p class="card-text">Generate reports on sales performance by date range</p>
+                <a href="{% url 'reports:sales_report' %}" class="btn btn-primary">Generate</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-boxes fa-3x mb-3 text-success"></i>
+                <h5 class="card-title">Inventory Report</h5>
+                <p class="card-text">View current inventory status and valuation</p>
+                <a href="{% url 'reports:inventory_report' %}" class="btn btn-success">Generate</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-exclamation-triangle fa-3x mb-3 text-warning"></i>
+                <h5 class="card-title">Low Stock Report</h5>
+                <p class="card-text">Identify products that need reordering</p>
+                <a href="{% url 'reports:low_stock_report' %}" class="btn btn-warning">Generate</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-sliders-h fa-3x mb-3 text-info"></i>
+                <h5 class="card-title">Custom Report</h5>
+                <p class="card-text">Create custom reports with specific parameters</p>
+                <a href="{% url
