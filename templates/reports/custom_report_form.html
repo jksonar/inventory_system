@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}Custom Report - Inventory System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Custom Report</h1>
+    <a href="{% url 'reports:home' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back to Reports
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0">Select Report Parameters</h5>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+                <label for="report_type" class="form-label">Report Type</label>
+                <select class="form-select" id="report_type" name="report_type" required>
+                    <option value="" selected disabled>Select a report type</option>
+                    <option value="sales">Sales Report</option>
+                    <option value="inventory">Inventory Report</option>
+                    <option value="low_stock">Low Stock Report</option>
+                </select>
+            </div>
+            
+            <!-- Date range (for sales reports) -->
+            <div class="row mb-3 report-param sales-param" style="display: none;">
+                <div class="col-md-6">
+                    <label for="start_date" class="form-label">Start Date</label>
+                    <input type="date" class="form-control" id="start_date" name="start_date">
+                </div>
+                <div class="col-md-6">
+                    <label for="end_date" class="form-label">End Date</label>
+                    <input type="date" class="form-control" id="end_date" name="end_date">
+                </div>
+            </div>
+            
+            <!-- Category filter (for inventory reports) -->
+            <div class="mb-3 report-param inventory-param" style="display: none;">
+                <label for="category" class="form-label">Category</label>
+                <select class="form-select" id="category" name="category">
+                    <option value="">All Categories</option>
+                    {% for category in categories %}
+                    <option value="{{ category.id }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">Report Format</label>
+                <div class="d-flex">
+                    <div class="form-check me-3">
+                        <input class="form-check-input" type="radio" name="report_format" id="format_html" value="html" checked>
+                        <label class="form-check-label" for="format_html">
+                            <i class="fas fa-file-code"></i> HTML
+                        </label>
+                    </div>
+                    <div class="form-check me-3">
+                        <input class="form-check-input" type="radio" name="report_format" id="format_pdf" value="pdf">
+                        <label class="form-check-label" for="format_pdf">
+                            <i class="fas fa-file-pdf"></i> PDF
+                        </label>
+                    </div>
+                    <div class="form-check me-3">
+                        <input class="form-check-input" type="radio" name="report_format" id="format_excel" value="excel">
+                        <label class="form-check-label" for="format_excel">
+                            <i class="fas fa-file-excel"></i> Excel
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="report_format" id="format_csv" value="csv">
+                        <label class="form-check-label" for="format_csv">
+                            <i class="fas fa-file-csv"></i> CSV
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-info">
+                <i class="fas fa-chart-line"></i> Generate Report
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Show/hide parameters based on report type
+        const reportTypeSelect = document.getElementById('report_type');
+        const salesParams = document.querySelectorAll('.sales-param');
+        const inventoryParams = document.querySelectorAll('.inventory-param');
+        
+        reportTypeSelect.addEventListener('change', function() {
+            // Hide all parameter sections first
+            document.querySelectorAll('.report-param').forEach(function(elem) {
+                elem.style.display = 'none';
+            });
+            
+            // Show relevant parameters based on report type
+            if (this.value === 'sales') {
+                salesParams.forEach(function(elem) {
+                    elem.style.display = 'flex';
+                });
+            } else if (this.value === 'inventory') {
+                inventoryParams.forEach(function(elem) {
+                    elem.style.display = 'block';
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}
