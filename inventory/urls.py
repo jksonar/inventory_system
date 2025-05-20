@@ -1,6 +1,8 @@
 from django.urls import path
 from . import views
 
+app_name = 'inventory'
+
 urlpatterns = [
     # Category
     path('categories/', views.CategoryListView.as_view(), name='category_list'),
