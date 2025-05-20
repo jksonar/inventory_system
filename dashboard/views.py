@@ -3,6 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Sum, Count, F, Q
 from django.utils import timezone
 from datetime import timedelta
+from django.http import HttpResponse
+import csv
 
 from inventory.models import Product, InventoryTransaction
 from sales.models import Sale, SaleItem
@@ -91,3 +93,43 @@ def activity_logs(request):
         logs = ActivityLog.objects.filter(user=request.user).order_by('-timestamp')
     
     return render(request, 'dashboard/activity_logs.html', {'logs': logs})
+
+@login_required
+def export_logs(request):
+    """Export activity logs as CSV"""
+    # Admin can export all logs, others can only export their own
+    if request.user.user_type == 'admin':
+        logs = ActivityLog.objects.all().order_by('-timestamp')
+    else:
+        logs = ActivityLog.objects.filter(user=request.user).order_by('-timestamp')
+    
+    # Create the HttpResponse object with CSV header
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="activity_logs.csv"'
+    
+    # Create CSV writer and write header row
+    writer = csv.writer(response)
+    writer.writerow(['User', 'Action', 'Entity Type', 'Entity ID', 'Description', 'IP Address', 'Timestamp'])
+    
+    # Write data rows
+    for log in logs:
+        writer.writerow([
+            log.user.username,
+            log.get_action_display() if hasattr(log, 'get_action_display') else log.action,
+            log.entity_type,
+            log.entity_id,
+            log.description,
+            log.ip_address,
+            log.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+        ])
+    
+    # Log this export activity
+    ActivityLog.objects.create(
+        user=request.user,
+        action='export',
+        entity_type='activity_logs',
+        description=f'Exported activity logs',
+        ip_address=request.META.get('REMOTE_ADDR')
+    )
+    
+    return response
