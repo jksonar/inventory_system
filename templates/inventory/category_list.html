@@ -24,8 +24,8 @@
                 <tr>
                     <th>Name</th>
                     <th>Description</th>
+                    <th>Products</th>
                     <th>Created</th>
-                    <th>Updated</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -34,8 +34,8 @@
                 <tr>
                     <td>{{ category.name }}</td>
                     <td>{{ category.description|truncatechars:50 }}</td>
+                    <td>{{ category.products.count }}</td>
                     <td>{{ category.created_at|date:"M d, Y" }}</td>
-                    <td>{{ category.updated_at|date:"M d, Y" }}</td>
                     <td>
                         <div class="dropdown">
                             <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
@@ -66,7 +66,6 @@
 <script>
     $(document).ready(function() {
         $('#categoriesTable').DataTable({
-            "order": [[2, "desc"]],
             "pageLength": 25,
             "language": {
                 "search": "Quick search:",
