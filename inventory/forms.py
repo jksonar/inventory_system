@@ -14,7 +14,18 @@ class SupplierForm(forms.ModelForm):
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = '__all__'
+        fields = ['name', 'sku', 'category', 'supplier', 'description', 'unit_price', 'quantity_in_stock', 'reorder_level', 'reorder_quantity']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'sku': forms.TextInput(attrs={'class': 'form-control'}),
+            'category': forms.Select(attrs={'class': 'form-control select2'}),
+            'supplier': forms.Select(attrs={'class': 'form-control select2'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'unit_price': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'quantity_in_stock': forms.NumberInput(attrs={'class': 'form-control'}),
+            'reorder_level': forms.NumberInput(attrs={'class': 'form-control'}),
+            'reorder_quantity': forms.NumberInput(attrs={'class': 'form-control'}),
+        }
 
 class InventoryTransactionForm(forms.ModelForm):
     class Meta:

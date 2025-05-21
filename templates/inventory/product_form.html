@@ -16,6 +16,16 @@
 </style>
 {% endblock %}
 
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('.select2').select2();
+        console.log('Select2 initialized');
+    });
+</script>
+{% endblock %}
+
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>{% if object.id %}Edit{% else %}New{% endif %} Product</h1>
@@ -26,7 +36,7 @@
 
 <div class="card">
     <div class="card-body">
-        <form method="post">
+        <form method="post" onsubmit="console.log('Form submitted'); return true;">
             {% csrf_token %}
 
             <div class="row mb-3">
@@ -111,6 +121,31 @@
                         {% if form.quantity_in_stock.errors %}
                         <div class="text-danger">
                             {{ form.quantity_in_stock.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group mb-3">
+                        <label for="{{ form.reorder_level.id_for_label }}" class="form-label">Reorder Level</label>
+                        {{ form.reorder_level }}
+                        {% if form.reorder_level.errors %}
+                        <div class="text-danger">
+                            {{ form.reorder_level.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <div class="form-group mb-3">
+                        <label for="{{ form.reorder_quantity.id_for_label }}" class="form-label">Reorder Quantity</label>
+                        {{ form.reorder_quantity }}
+                        {% if form.reorder_quantity.errors %}
+                        <div class="text-danger">
+                            {{ form.reorder_quantity.errors }}
                         </div>
                         {% endif %}
                     </div>

@@ -58,18 +58,18 @@ class ProductCreateView(CreateView):
     model = Product
     form_class = ProductForm
     template_name = 'inventory/product_form.html'
-    success_url = reverse_lazy('product_list')
+    success_url = reverse_lazy('inventory:product_list')
 
 class ProductUpdateView(UpdateView):
     model = Product
     form_class = ProductForm
     template_name = 'inventory/product_form.html'
-    success_url = reverse_lazy('product_list')
+    success_url = reverse_lazy('inventory:product_list')
 
 class ProductDeleteView(DeleteView):
     model = Product
     template_name = 'inventory/product_confirm_delete.html'
-    success_url = reverse_lazy('product_list')
+    success_url = reverse_lazy('inventory:product_list')
 
 
 # InventoryTransaction Views
@@ -81,4 +81,4 @@ class InventoryTransactionCreateView(CreateView):
     model = InventoryTransaction
     form_class = InventoryTransactionForm
     template_name = 'inventory/transaction_form.html'
-    success_url = reverse_lazy('transaction_list')
+    success_url = reverse_lazy('inventory:transaction_list')
